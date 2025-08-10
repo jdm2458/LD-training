@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LD Electrical Service Training</title>
+  <style>
+    /* Layout + theme (keeps your original look & logos) */
+    :root{
+      --orange:#FF4500;
+      --teal:#00BFFF;
+      --bg:#000;
+      --card:#111;
+    }
+    html,body{height:100%;margin:0;}
+    body{
+      background-color:var(--bg);
+      color:#fff;
+      font-family:Arial,Helvetica,sans-serif;
+      position:relative;
+      /* original background logos (left & right) */
+      background-image: url('https://i.ibb.co/cRGH7Hg/LDVector-Pic.png'), url('https://i.ibb.co/cRGH7Hg/LDVector-Pic.png');
+      background-position: left top, right top;
+      background-repeat: repeat-y, repeat-y;
+      background-size:150px auto,150px auto;
+      background-attachment: fixed;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+    }
+    /* subtle overlay for better contrast */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .container{
+      max-width:900px;
+      margin:24px auto;
+      padding:20px;
+      position:relative;
+      z-index:1;
+    }
+
+    .logo{
+      text-align:center;
+      font-size:34px;
+      color:var(--orange);
+      font-weight:700;
+      margin-bottom:6px;
+      letter-spacing:.6px;
+    }
+    h1{ margin:6px 0 12px; font-size:20px; color:#fff; }
+    p.lead{ margin:8px 0 18px; color:#ddd; }
+
+    /* buttons */
+    .btn {
+      background:var(--orange);
+      color:#fff;
+      border:none;
+      padding:10px 18px;
+      margin:8px 6px 12px 6px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:15px;
+      transition:background .18s ease,transform .08s ease;
+    }
+    .btn:hover{ background:var(--teal); }
+    .btn.block{ display:block; width:100%; max-width:360px; }
+    .btn.secondary{ background:var(--teal); }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+
+    /* sections */
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:8px;
+      padding:14px;
+      margin-top:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    }
+    .hidden{ display:none; }
+    .highlight{ color:var(--teal); font-weight:600; }
+
+    .progress{ color:var(--orange); font-size:0.95rem; margin-bottom:10px; }
+
+    #guide-content a{ color:var(--teal); font-weight:600; text-decoration:none; }
+    #guide-content a:hover{ color:var(--orange); }
+
+    /* test layout */
+    #test-form > .q{ margin-bottom:14px; padding:8px 6px; border-radius:6px; background:rgba(255,255,255,0.02); }
+    #test-form p.qtext{ margin:0 0 8px 0; font-weight:600; color:#fff; }
+    #test-form label{ display:block; cursor:pointer; color:#ddd; margin:4px 0; }
+
+    /* submission panel */
+    #copy-paste-content{
+      margin-top:14px;
+      padding:14px;
+      border-radius:8px;
+      background:#121212;
+      color:#f6f6f6;
+      font-family:Menlo,Monaco,monospace;
+      font-size:14px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    /* mobile tweaks */
+    @media (max-width:600px){
+      .container{ padding:12px; }
+      .logo{ font-size:28px; }
+      .btn{ width:100%; }
+      body{ background-size:100px auto,100px auto; background-position:center top, center top; background-attachment:scroll; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">LD ELECTRICAL SERVICES</div>
+    <h1>LD Electrical Service Training</h1>
+    <p class="lead">Select your training module below. Each module includes: Guide → Test (25 Qs) → Acknowledgment → Submission text to email.</p>
+
+    <div class="actions">
+      <button class="btn" id="btn-forklift">Forklift Training</button>
+      <button class="btn" id="btn-construction">Construction Forklift Training</button>
+      <button class="btn" id="btn-mewp">MEWP Training</button>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div id="training-card" class="card hidden" aria-live="polite">
+      <h2 id="training-title" class="highlight"></h2>
+      <div class="progress" id="progress-text">Progress: Guide</div>
+
+      <!-- GUIDE -->
+      <div id="guide-section" class="">
+        <h3>Training Guide</h3>
+        <div id="guide-content" style="margin-bottom:12px;"></div>
+        <div class="actions">
+          <button class="btn" id="btn-proceed-test">Proceed to Test</button>
+        </div>
+      </div>
+
+      <!-- TEST -->
+      <div id="test-section" class="hidden">
+        <h3>Test</h3>
+        <form id="test-form" novalidate></form>
+        <div class="actions">
+          <button class="btn secondary" id="btn-submit-test">Submit Test</button>
+          <button class="btn" id="btn-back-guide">Back to Guide</button>
+        </div>
+      </div>
+
+      <!-- ACKNOWLEDGMENT (trainer Joseph Espino) -->
+      <div id="understand-section" class="hidden">
+        <h3>Understanding Acknowledgment</h3>
+        <p>This authorization is only for the company, facility and equipment listed and cannot be transferred to another company or facility.</p>
+        <p><strong>Qualified Evaluator (Trainer): Joseph Espino</strong></p>
+        <label for="signature">Type your full name as digital signature:</label>
+        <input type="text" id="signature" placeholder="Full name" />
+        <div class="actions">
+          <button class="btn" id="btn-sign-proceed">Sign and Proceed</button>
+          <button class="btn" id="btn-back-test">Back to Test</button>
+        </div>
+      </div>
+
+      <!-- SUBMISSION (no selfie upload, only generate text) -->
+      <div id="info-section" class="hidden">
+        <h3>Submit Your Training Record</h3>
+        <p>Please <strong>copy the text below</strong> and email it along with a selfie to <strong style="color:var(--orange)">joeye@ldelectricalservice.com</strong>. Make sure your selfie clearly shows your face and the date.</p>
+        <div class="actions">
+          <button class="btn" id="btn-generate-text">Generate Submission Text</button>
+          <button class="btn" id="btn-back-understand">Back to Acknowledgment</button>
+        </div>
+        <div id="copy-paste-content" class="hidden" role="region" aria-label="Submission text"></div>
+      </div>
+
+    </div> <!-- training-card -->
+  </div> <!-- container -->
+
+  <script>
+    /* ===========================
+       Data: full 25-question sets
+       =========================== */
+
+    const trainings = {
+      forklift: {
+        title: 'Warehouse Forklift Training',
+        guidePdf: 'https://drive.google.com/uc?export=view&id=1WHmYdioMq3_HhTfqSlvW5rLPUN2eETYr',
+        passScore: 80,
+        questions: [
+          { q: '1. The following item(s) MUST PASS inspection, or the unit will be tagged out:', options:['a. Horn','b. Lights','c. Backup Alarm','d. All of the above'], correct:3 },
+          { q: '2. When placing a load into a rack system, you should:', options:['a) Turn as you raise the load for added speed and efficiency','b) Turn before raising the load, then raise the load while stationary','c) There is no rule on raising and turning','d) None of the above'], correct:1 },
+          { q: '3. When inspecting cushion (slick) tires the wear indicator is:', options:['a) Determined by the fleet or maintenance department','b) The top of the sidewall letters or the sidewall ring','c) Not important since there is no tread','d) None of the above'], correct:1 },
+          { q: '4. The stability of your forklift:', options:['a) Is not important since you never lift heavy loads','b) Moves as you pick up a load or turn your forklift','c) Works in mysterious ways','d) All of the above'], correct:1 },
+          { q: '5. A good rule to use for determining if you should travel in reverse is:', options:['a) If your load is taller than your steering wheel','b) There is no rule, just use your best judgement','c) Always go forward, pedestrians will move if you honk your horn','d) None of the above'], correct:0 },
+          { q: '6. If you raise a load that is WITHIN CAPACITY, how is the combined center of gravity affected?', options:['a) It moves outside of the stability triangle','b) It is not affected since the load is within capacity','c) It moves towards the front axle and up, but stays within the stability triangle','d) None of the above'], correct:2 },
+          { q: '7. If your forklift is out of your line of sight, or you are going to be more than 25 feet away, you should:', options:['a) Lower the forks all the way to the ground','b) Put it in neutral and turn off the key','c) Set the brake','d) All of the above'], correct:3 },
+          { q: '8. Operators must be trained and authorized to operate:', options:['a) A man-basket attachment','b) A boom jib attachment','c) A clamp attachment','d) All of the above'], correct:3 },
+          { q: '9. If you have a load that is 6 feet long (front to back) what is the load center (center of the load):', options:['a) 4 Feet (48 inches)','b) 3 Feet (36 inches)','c) 2 Feet (24 inches)','d) 6 Feet (60 inches)'], correct:1 },
+          { q: '10. When picking up a load, operators should have their forks under AT LEAST (minimum):', options:['a) The full load','b) 2/3 of the load','c) 1/2 of the load','d) None of the above'], correct:1 },
+          { q: '11. The safe and recommended traveling speed for all forklifts is:', options:['a) 2-3 Miles an hour','b) 5-6 Miles an hour','c) 7-8 Miles an hour','d) None of the above'], correct:1 },
+          { q: '12. If you have a forklift license from your company, you can:', options:['a) Drive any forklift at any other company at any time','b) Drive any lift at a different company, if the boss approves','c) Only drive the forklift for your company at your facility after an evaluation','d) All of the above'], correct:2 },
+          { q: '13. Under OSHA Guidelines 1910.178', options:['a) Operators must have formal training','b) Operators must pass a driving evaluation on the lift they will use','c) Be re-evaluated or re-trained every 3 years','d) All of the above'], correct:3 },
+          { q: '14. Employers of forklift operators should:', options:['a) Evaluate operators on the lifts they are qualified to operate','b) Review site and company safety guidelines for the facility','c) Provide PPE for the job the employee is performing','d) All of the above'], correct:3 },
+          { q: '15. As a trained and authorized forklift operator you will need retraining and could lose your license if:', options:['a) You have an accident or near miss','b) You are driving unsafe','c) The facility or the type of forklift you are driving changes','d) All of the above'], correct:3 },
+          { q: '16. Wearing your seatbelt is ALWAYS mandatory when operating a sit-down forklift', options:['True','False'], correct:0 },
+          { q: '17. If your STAND-UP lift tips over, you should step away quickly (Jump) from the lift.', options:['True','False'], correct:1 },
+          { q: '18. If your SIT-DOWN counterbalance lift tips over, you should stay in the operator compartment with your seatbelt fastened, brace yourself, and lean in the opposite direction of the fall.', options:['True','False'], correct:0 },
+          { q: '19. Sit-down counterbalanced forklifts with four wheels have four points of stability, like your car', options:['True','False'], correct:1 },
+          { q: '20. You do not need to inspect your forklift before you use it, if it was already done this month', options:['True','False'], correct:1 },
+          { q: '21. How many points of stability does a sit-down counterbalance forklift have?', options:['a) 2','b) 3','c) 4','d) None of the above'], correct:1 },
+          { q: '22. When loading a trailer, operators should be cautious of:', options:['a) The placement of the dock-plate','b) Pedestrians passing the dock doors','c) Trailer creep','d) All of the above'], correct:3 },
+          { q: '23. If you have a longer than standard load, how does it affect your lifting capacity?', options:['a) It does not affect the capacity','b) It reduces the capacity you can lift','c) It increases the capacity you can lift','d) None of the above'], correct:1 },
+          { q: '24. Operators can carry two pallets, side by side or one on each fork, if they are careful', options:['True','False'], correct:1 },
+          { q: '25. On ramps, the load should be downhill from the operator', options:['True','False'], correct:1 }
+        ]
+      },
+
+      construction: {
+        title: 'Construction Forklift Training',
+        guidePdf: 'https://drive.google.com/uc?export=view&id=1IjewZuAGhjOa7nU_CLHetP4bQPISXePe',
+        passScore: 80,
+        questions: [
+          { q: '1. Vertical mast rough terrain forklifts typically have controls similar to a warehouse sit-down lift', options:['True','False'], correct:0 },
+          { q: '2. On ramps or steep inclines, the load should be carried uphill or upgrade.', options:['True','False'], correct:0 },
+          { q: '3. This type of rough terrain lift does not have a stability triangle.', options:['True','False'], correct:1 },
+          { q: '4. Attachments are never used on this type of forklift', options:['True','False'], correct:1 },
+          { q: '5. Operators should understand the load center when operating this type of lift', options:['True','False'], correct:0 },
+          { q: '6. How many points of stability does a vertical mast rough terrain forklift have?', options:['a) 2','b) 3','c) 4','d) Same as an automobile'], correct:1 },
+          { q: '7. When carrying a tall load that blocks your forward vision, operators should never:', options:['a) Drive backwards','b) Use a spotter','c) Raise the load up high so they can see under it','d) None of the above'], correct:2 },
+          { q: '8. Rough terrain forklifts have:', options:['a) A data plate like a sit-down warehouse lift','b) A stability triangle like a sit-down warehouse lift','c) The same certification rules as a sit-down warehouse lift','d) All of the above'], correct:3 },
+          { q: '9. When adding an attachment to a vertical mast rough terrain lift you should:', options:['a) Be aware of the changes in the lift capacity','b) Know who to call if you drop the load or the attachment fails','c) Contact the lift manufacturer for approval before use every time','d) All of the above'], correct:3 },
+          { q: '10. If the load is heavier than the capacity of the lift you should:', options:['a) Tell the boss and then be careful','b) Add extra weight to the back or have another worker hop on the back','c) Get a bigger lift or reduce the size of the load','d) None of the above'], correct:2 },
+          { q: '11. OSHA requires forklift operators to be certified since:', options:['a) 1998','b) 2000','c) 2010','d) 1910'], correct:0 },
+          { q: '12. Forklifts account for how many fatal accidents per year approximately?', options:['a) 85','b) 100','c) 200','d) 500'], correct:0 },
+          { q: '13. A significant percentage of forklift accidents are due to tipping over:', options:['a) 10%','b) 18%','c) 26%','d) 50%'], correct:2 },
+          { q: '14. Operators must complete formal training and a practical evaluation:', options:['True','False'], correct:0 },
+          { q: '15. Class VII forklifts are designed for:', options:['a) Indoor use','b) Rough terrain','c) Narrow aisles','d) Electric motors only'], correct:1 },
+          { q: '16. Telehandlers are commonly fitted with:', options:['a) Loading buckets','b) Man-baskets','c) Boom jibs','d) All of the above'], correct:3 },
+          { q: '17. The Safe Load Indicator on a telehandler should be calibrated to prevent overturns:', options:['True','False'], correct:0 },
+          { q: '18. Standing on a pallet raised by a forklift is safe if secured:', options:['True','False'], correct:1 },
+          { q: '19. Attachments on construction forklifts can affect stability and lifting capacity:', options:['True','False'], correct:0 },
+          { q: '20. The operator must inspect the forklift before each use:', options:['True','False'], correct:0 },
+          { q: '21. When driving on uneven terrain, the safest practice is to:', options:['a) Drive slowly and keep the load low','b) Raise the load high for better visibility','c) Turn quickly to avoid obstacles','d) None of the above'], correct:0 },
+          { q: '22. When parking a forklift on an incline, you should:', options:['a) Leave the forks elevated','b) Set the parking brake and chock the wheels','c) Leave the forklift in neutral','d) None of the above'], correct:1 },
+          { q: '23. When operating a telehandler, the boom should always be:', options:['a) Fully extended','b) Kept at the lowest possible height','c) Moved quickly','d) None of the above'], correct:1 },
+          { q: '24. The rated capacity of a forklift must never be exceeded:', options:['True','False'], correct:0 },
+          { q: '25. Operators should always wear a seatbelt when operating a forklift:', options:['True','False'], correct:0 }
+        ]
+      },
+
+      mewp: {
+        title: 'MEWP Training',
+        guidePdf: 'https://drive.google.com/uc?export=view&id=1bO6RhfLpPKBo5H1M9lcHtwKqQKtc5xbJ',
+        passScore: 80,
+        questions: [
+          { q: '1. MEWP stands for:', options:['Mobile Elevated Work Platform','Mechanical Elevated Work Platform','Motorized Elevated Work Platform','None of the above'], correct:0 },
+          { q: '2. Before using a MEWP, the operator must:', options:['a) Check the weather conditions','b) Inspect the equipment','c) Attend a formal training and evaluation','d) All of the above'], correct:3 },
+          { q: '3. The primary hazard when operating a MEWP is:', options:['a) Falling from height','b) Electric shock','c) Tipping over','d) All of the above'], correct:3 },
+          { q: '4. The maximum platform load capacity should:', options:['a) Never be exceeded','b) Be ignored if the load is small','c) Only consider operator weight','d) Be doubled for safety'], correct:0 },
+          { q: '5. When working near power lines, you should:', options:['a) Maintain a safe distance','b) Use insulated MEWPs','c) Use a spotter','d) All of the above'], correct:3 },
+          { q: '6. Fall protection is required when:', options:['a) The MEWP manufacturer specifies','b) The work site rules require it','c) Working at certain heights','d) All of the above'], correct:3 },
+          { q: '7. The outriggers or stabilizers on a MEWP should be:', options:['a) Deployed on uneven surfaces','b) Used only if recommended','c) Fully deployed on level ground','d) Not used'], correct:2 },
+          { q: '8. Before moving a MEWP with the platform elevated, you should:', options:['a) Ensure the path is clear','b) Lower the platform if possible','c) Use slow speeds','d) All of the above'], correct:3 },
+          { q: '9. Emergency lowering devices should be:', options:['a) Tested regularly','b) Used only by authorized personnel','c) Familiar to all operators','d) All of the above'], correct:3 },
+          { q: '10. MEWP operators should:', options:['a) Not carry tools on the platform','b) Keep the platform floor clear','c) Only operate on hard, stable surfaces','d) All of the above'], correct:3 },
+          { q: '11. When using a boom-type MEWP, the boom should be:', options:['a) Fully extended at all times','b) Positioned carefully to avoid hazards','c) Moved quickly to save time','d) None of the above'], correct:1 },
+          { q: '12. The most common cause of MEWP tip-overs is:', options:['a) Overloading the platform','b) Operating on uneven terrain','c) Hitting an obstacle','d) All of the above'], correct:3 },
+          { q: '13. Operators must be re-evaluated and retrained:', options:['a) Every 3 years','b) After an accident','c) If they operate a different MEWP','d) All of the above'], correct:3 },
+          { q: '14. Operating a MEWP while fatigued or under influence:', options:['a) Is safe with proper care','b) Is prohibited and dangerous','c) Depends on the situation','d) None of the above'], correct:1 },
+          { q: '15. Platform controls should be tested:', options:['a) Before each use','b) Monthly','c) Only when malfunction suspected','d) Never'], correct:0 },
+          { q: '16. Safety signs and load limits on MEWPs should:', options:['a) Be ignored if in a hurry','b) Be followed strictly','c) Only be read by supervisors','d) None of the above'], correct:1 },
+          { q: '17. MEWPs should not be used in:', options:['a) High winds','b) Rain','c) Snow','d) All of the above unless manufacturer allows'], correct:3 },
+          { q: '18. Operators should wear a harness attached to:', options:['a) The MEWP platform','b) Nearby structure','c) Their own belt','d) None of the above'], correct:0 },
+          { q: '19. MEWP batteries or fuel tanks should be checked:', options:['a) Weekly','b) Before each use','c) Monthly','d) Never'], correct:1 },
+          { q: '20. When working near traffic, operators should:', options:['a) Use warning signs','b) Have a spotter','c) Wear high visibility clothing','d) All of the above'], correct:3 },
+          { q: '21. Platform gate or chain should be closed:', options:['a) Only when elevated','b) At all times','c) Only if supervisor present','d) None of the above'], correct:1 },
+          { q: '22. Operators should avoid sudden starts, stops or turns:', options:['True','False'], correct:0 },
+          { q: '23. When parking the MEWP, the platform should be:', options:['a) Lowered fully','b) Raised slightly','c) At working height','d) None of the above'], correct:0 },
+          { q: '24. It is safe to ride on the forks of a MEWP:', options:['True','False'], correct:1 },
+          { q: '25. Only trained and authorized personnel may operate a MEWP:', options:['True','False'], correct:0 }
+        ]
+      }
+    };
+
+    /* ================
+       State variables
+       ================ */
+    let currentTraining = null;
+    let signatureName = '';
+    let lastScore = null;
+
+    /* ================
+       Element refs
+       ================ */
+    const trainingCard = document.getElementById('training-card');
+    const trainingTitle = document.getElementById('training-title');
+    const progressText = document.getElementById('progress-text');
+    const guideContent = document.getElementById('guide-content');
+
+    const guideSection = document.getElementById('guide-section');
+    const testSection = document.getElementById('test-section');
+    const understandSection = document.getElementById('understand-section');
+    const infoSection = document.getElementById('info-section');
+
+    const testForm = document.getElementById('test-form');
+    const copyPasteDiv = document.getElementById('copy-paste-content');
+    const signatureInput = document.getElementById('signature');
+
+    /* ================
+       Wire up top buttons
+       ================ */
+    document.getElementById('btn-forklift').addEventListener('click', () => startTraining('forklift'));
+    document.getElementById('btn-construction').addEventListener('click', () => startTraining('construction'));
+    document.getElementById('btn-mewp').addEventListener('click', () => startTraining('mewp'));
+
+    document.getElementById('btn-proceed-test').addEventListener('click', () => showSubSection('test'));
+    document.getElementById('btn-back-guide').addEventListener('click', () => showSubSection('guide'));
+    document.getElementById('btn-back-test').addEventListener('click', () => showSubSection('test'));
+    document.getElementById('btn-sign-proceed').addEventListener('click', signAndProceed);
+    document.getElementById('btn-back-understand').addEventListener('click', () => showSubSection('understand'));
+    document.getElementById('btn-submit-test').addEventListener('click', submitTest);
+    document.getElementById('btn-generate-text').addEventListener('click', generateCopyPaste);
+
+    /* ================
+       Functions
+       ================ */
+
+    function startTraining(key){
+      if(!trainings[key]) return;
+      currentTraining = key;
+      trainingCard.classList.remove('hidden');
+      trainingTitle.textContent = trainings[key].title;
+      // guide link opens in NEW tab per your request
+      guideContent.innerHTML = `
+        <p>Open the training guide (opens in a new tab):</p>
+        <p><a href="${trainings[key].guidePdf}" target="_blank" rel="noopener noreferrer">${trainings[key].title} Guide PDF</a></p>
+        <p style="color:#ccc; margin-top:6px;"><em>Please read the guide fully before taking the test.</em></p>
+      `;
+      // reset any previous state
+      signatureName = '';
+      signatureInput.value = '';
+      copyPasteDiv.classList.add('hidden');
+      copyPasteDiv.textContent = '';
+      lastScore = null;
+      // show guide first
+      showSubSection('guide');
+      // build test but do not display yet (for speed)
+      buildTestForm();
+      // ensure top progress text
+      progressText.textContent = 'Progress: Guide';
+      // scroll training card into view on mobile
+      trainingCard.scrollIntoView({behavior:'smooth'});
+    }
+
+    function showSubSection(name){
+      // hide all subsections
+      [guideSection, testSection, understandSection, infoSection].forEach(s => s.classList.add('hidden'));
+      // show requested
+      if(name === 'guide'){ guideSection.classList.remove('hidden'); progressText.textContent='Progress: Guide'; }
+      if(name === 'test'){ testSection.classList.remove('hidden'); progressText.textContent='Progress: Test'; }
+      if(name === 'understand'){ understandSection.classList.remove('hidden'); progressText.textContent='Progress: Acknowledgment'; }
+      if(name === 'info'){ infoSection.classList.remove('hidden'); progressText.textContent='Progress: Submission'; }
+    }
+
+    function buildTestForm(){
+      // build dynamic form (25 questions)
+      testForm.innerHTML = ''; // clear
+      const qset = trainings[currentTraining].questions;
+      qset.forEach((item, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'q';
+        const qTitle = document.createElement('p');
+        qTitle.className = 'qtext';
+        qTitle.textContent = item.q;
+        wrapper.appendChild(qTitle);
+
+        item.options.forEach((opt, i) => {
+          const label = document.createElement('label');
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'q' + idx;
+          radio.value = String(i);
+          radio.style.marginRight = '8px';
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(opt));
+          wrapper.appendChild(label);
+        });
+        testForm.appendChild(wrapper);
+      });
+    }
+
+    function submitTest(){
+      // validate all answered
+      const qset = trainings[currentTraining].questions;
+      let unanswered = 0;
+      let correct = 0;
+      for(let i=0;i<qset.length;i++){
+        const sel = testForm.querySelector('input[name="q'+i+'"]:checked');
+        if(!sel){ unanswered++; } else {
+          if(parseInt(sel.value,10) === qset[i].correct) correct++;
+        }
+      }
+      if(unanswered>0){
+        alert(`Please answer all questions before submitting. You have ${unanswered} unanswered.`);
+        return;
+      }
+      const percent = (correct / qset.length) * 100;
+      lastScore = Number(percent.toFixed(1));
+      const passPct = trainings[currentTraining].passScore || 80;
+      if(percent >= passPct){
+        alert(`Congratulations — you passed! Score: ${lastScore}%`);
+        // go to acknowledgment (signature step)
+        showSubSection('understand');
+      } else {
+        alert(`You scored ${lastScore}%. Minimum passing score is ${passPct}%. Please review the guide and try again.`);
+        // send them back to guide to review
+        showSubSection('guide');
+      }
+    }
+
+    function signAndProceed(){
+      const name = signatureInput.value.trim();
+      if(!name){
+        alert('Please type your full name as a digital signature to proceed.');
+        return;
+      }
+      signatureName = name;
+      // proceed to info / submission generation step
+      showSubSection('info');
+    }
+
+    function generateCopyPaste(){
+      if(!signatureName){
+        alert('Signature missing. Go back to the acknowledgment and enter your full name.');
+        showSubSection('understand');
+        return;
+      }
+      if(lastScore === null){
+        alert('Test score not found. Complete the test first.');
+        showSubSection('test');
+        return;
+      }
+      const typeTitle = trainings[currentTraining].title;
+      const text = [
+        `Name: ${signatureName}`,
+        `Test Type: ${typeTitle}`,
+        `Test Score: ${lastScore}%`,
+        '',
+        'By submitting this, I acknowledge that I have completed the training and understand the responsibilities associated with operating the equipment.',
+        '',
+        'Please attach a selfie (photo) to the same email when sending this info.',
+        '',
+        'Send to: joeye@ldelectricalservice.com'
+      ].join('\n');
+
+      copyPasteDiv.classList.remove('hidden');
+      copyPasteDiv.textContent = text;
+      copyPasteDiv.scrollIntoView({behavior:'smooth'});
+      // visually emphasize email instruction (we already have it above, but repeat)
+      const emailNote = document.createElement('p');
+      emailNote.style.marginTop = '10px';
+      emailNote.style.fontWeight = '700';
+      emailNote.style.color = 'var(--orange)';
+      emailNote.innerHTML = 'IMPORTANT: <span style="color:#fff">Copy the text above and email it to</span> <strong style="color:var(--orange)">joeye@ldelectricalservice.com</strong> <span style="color:#fff">and attach your selfie photo.</span>';
+      if(!copyPasteDiv.nextElementSibling || copyPasteDiv.nextElementSibling.id !== 'email-note'){
+        emailNote.id = 'email-note';
+        copyPasteDiv.parentNode.insertBefore(emailNote, copyPasteDiv.nextSibling);
+      }
+    }
+
+    /* Initialize: keep training card hidden until user picks a module.
+       Nothing else to run on load. */
+  </script>
+</body>
+</html>
+add training page
